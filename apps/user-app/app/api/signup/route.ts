@@ -1,9 +1,8 @@
-import { NextApiRequest } from "next";
 import db from "@repo/db/client";
 import bcrypt from "bcrypt";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const POST = async (req: NextApiRequest) => {
+export const POST = async (req: NextRequest) => {
   const body = await req.json();
   const { name, phone, password, email } = body;
   console.log(name);

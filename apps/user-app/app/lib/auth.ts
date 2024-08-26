@@ -2,6 +2,15 @@ import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
 
+interface Session {
+  user: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+    image?: string | null;
+  };
+}
+
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -31,7 +40,7 @@ export const authOptions = {
             return {
               id: existingUser.id.toString(),
               name: existingUser.name,
-              email: existingUser.number,
+              phone: existingUser.number,
             };
           }
         }
@@ -41,12 +50,21 @@ export const authOptions = {
   ],
   pages: {
     signIn: "/signin",
+    signOut: "/signin",
   },
   secret: process.env.JWT_SECRET || "secret",
   callbacks: {
-    async session({ token, session }: any) {
-      session.user.id = token.sub;
+    async session({ session, token, user }: any) {
+      if (session?.user) {
+        session.user.id = token.sub || user?.id;
+      }
       return session;
+    },
+    async jwt({ token, user }: any) {
+      if (user) {
+        token.sub = user.id;
+      }
+      return token;
     },
   },
 };

@@ -7,14 +7,16 @@ export function AppbarClient() {
   const session = useSession();
   const router = useRouter();
 
+  const handleSignOut = async () => {
+    await signOut({ redirect: false });
+    router.push("/signin");
+  };
+
   return (
     <div>
       <Appbar
         onSignin={signIn}
-        onSignout={async () => {
-          await signOut();
-          router.push("/signin");
-        }}
+        onSignout={handleSignOut}
         user={session.data?.user}
       />
     </div>

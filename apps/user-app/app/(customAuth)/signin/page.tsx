@@ -21,7 +21,7 @@ const Signin = () => {
     });
     if (result?.ok) {
       setLoading((prev) => !prev);
-      return router.push("/dashboard");
+      router.push("/dashboard");
     } else {
       setLoading((prev) => !prev);
       alert("Error while fetching data");

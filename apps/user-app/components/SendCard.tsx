@@ -6,45 +6,56 @@ import { TextInput } from "@repo/ui/textinput";
 import { useState } from "react";
 import { p2pTransfer } from "../app/lib/actions/p2pTransfer";
 
-export function SendCard() {
-  const [number, setNumber] = useState("");
-  const [amount, setAmount] = useState("");
+interface SendCardProps {
+  setPaymentModal: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function SendCard({ setPaymentModal }: SendCardProps) {
+  const [number, setNumber] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
+  const handleSend = async () => {
+    setLoading(true);
+    try {
+      await p2pTransfer(number, Number(amount) * 100);
+    } catch (error) {
+      console.error("Error during transfer:", error);
+    } finally {
+      setLoading(false);
+      setPaymentModal(false);
+    }
+  };
+
   return (
-    <div className="h-[90vh]">
-      <Center>
-        <Card title="Send">
-          <div className="min-w-72 pt-2">
-            <TextInput
-              placeholder={"Number"}
-              label="Number"
-              onChange={(value) => {
-                setNumber(value);
-              }}
-            />
-            <TextInput
-              placeholder={"Amount"}
-              label="Amount"
-              onChange={(value) => {
-                setAmount(value);
-              }}
-            />
-            <div className="pt-4 flex justify-center">
-              <Button
-                loading={loading}
-                onClick={async () => {
-                  setLoading((prev) => !prev);
-                  await p2pTransfer(number, Number(amount) * 100);
-                  setLoading((prev) => !prev);
-                }}
-              >
-                Send
-              </Button>
+    <div className="absolute inset-0 flex items-center justify-center">
+      <div
+        className="fixed inset-0 bg-black opacity-50 z-10"
+        onClick={() => setPaymentModal(false)}
+      />
+      <div className="relative z-20">
+        <Center>
+          <Card title="Send">
+            <div className="min-w-72 pt-2">
+              <TextInput
+                placeholder="Number"
+                label="Number"
+                onChange={setNumber}
+              />
+              <TextInput
+                placeholder="Amount"
+                label="Amount"
+                onChange={setAmount}
+              />
+              <div className="pt-4 flex justify-center">
+                <Button loading={loading} onClick={handleSend}>
+                  Send
+                </Button>
+              </div>
             </div>
-          </div>
-        </Card>
-      </Center>
+          </Card>
+        </Center>
+      </div>
     </div>
   );
 }
